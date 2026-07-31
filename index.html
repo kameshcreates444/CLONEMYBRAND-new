@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KameshCreates — Reel Creation & Editing</title>
+<meta name="description" content="Hook-driven reel editing for creators & businesses. 27K+ followers, 5M+ views in 30 days. AI-powered edits from ₹1,299. First reel delivered in 24–48 hours.">
+<meta property="og:title" content="KameshCreates — Reels That Stop The Scroll">
+<meta property="og:description" content="Hook-driven reel editing for creators & businesses. 27K+ followers, 5M+ views in 30 days. AI-powered edits from ₹1,299.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/og-cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0c;
+    --bg-soft:#111114;
+    --surface:#17171b;
+    --surface-2:#1d1d22;
+    --line:#26262c;
+    --text:#f3f3f1;
+    --text-dim:#98989f;
+    --text-faint:#5c5c63;
+    --accent:#ff3b5c;
+    --accent-soft:rgba(255,59,92,.14);
+    --accent-2:#7c5cff;
+    --accent-2-soft:rgba(124,92,255,.14);
+    --radius:18px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important;}
+  }
+
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--accent);color:#fff;}
+
+  .wrap{max-width:1160px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- Waveform signature (used as scroll progress + section divider) ---------- */
+  .wave-progress{
+    position:fixed;top:0;left:0;height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    z-index:999;width:0%;
+    transition:width .08s linear;
+  }
+  .wave-divider{
+    display:flex;align-items:flex-end;justify-content:center;gap:3px;
+    height:34px;margin:0 auto;opacity:.55;
+  }
+  .wave-divider span{
+    width:3px;border-radius:2px;
+    background:linear-gradient(180deg,var(--accent),var(--accent-2));
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  .wave-divider span:nth-child(1){height:10px;animation-delay:.0s}
+  .wave-divider span:nth-child(2){height:22px;animation-delay:.15s}
+  .wave-divider span:nth-child(3){height:34px;animation-delay:.3s}
+  .wave-divider span:nth-child(4){height:16px;animation-delay:.45s}
+  .wave-divider span:nth-child(5){height:26px;animation-delay:.6s}
+  .wave-divider span:nth-child(6){height:12px;animation-delay:.75s}
+  .wave-divider span:nth-child(7){height:20px;animation-delay:.9s}
+  @keyframes pulse{
+    0%,100%{transform:scaleY(.4);opacity:.5}
+    50%{transform:scaleY(1);opacity:1}
+  }
+
+  /* ---------- Nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:900;
+    backdrop-filter:blur(16px) saturate(140%);
+    background:rgba(10,10,12,.65);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1160px;margin:0 auto;padding:16px 28px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .logo{font-weight:700;font-size:18px;letter-spacing:.5px;}
+  .logo span{color:var(--accent);}
+  .nav-links{display:flex;gap:32px;font-size:14.5px;color:var(--text-dim);}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{
+    padding:9px 18px;border-radius:100px;
+    background:var(--text);color:var(--bg);
+    font-size:13.5px;font-weight:600;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  .nav-cta:hover{transform:translateY(-1px);opacity:.9;}
+  .nav-toggle{
+    display:none;flex-direction:column;gap:5px;
+    background:none;border:none;cursor:pointer;padding:6px;
+  }
+  .nav-toggle span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .25s ease, opacity .25s ease;}
+  .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .nav-toggle.open span:nth-child(2){opacity:0;}
+  .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  .nav-mobile-panel{
+    display:none;flex-direction:column;gap:2px;
+    max-height:0;overflow:hidden;
+    background:rgba(10,10,12,.96);border-bottom:1px solid var(--line);
+    transition:max-height .3s ease;
+  }
+  .nav-mobile-panel.open{max-height:260px;}
+  .nav-mobile-panel a{
+    padding:16px 28px;font-size:15px;color:var(--text-dim);border-top:1px solid var(--line);
+  }
+  .nav-mobile-panel a:hover{color:var(--text);background:var(--surface);}
+  @media (max-width:820px){
+    .nav-links{display:none;}
+    .nav-toggle{display:flex;}
+    .nav-mobile-panel{display:flex;}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    padding:180px 0 100px;
+    overflow:hidden;
+  }
+  .hero-glow{
+    position:absolute;top:-200px;right:-200px;width:600px;height:600px;
+    background:radial-gradient(circle,var(--accent-soft),transparent 70%);
+    filter:blur(20px);pointer-events:none;
+  }
+  .hero-glow-2{
+    position:absolute;bottom:-250px;left:-200px;width:600px;height:600px;
+    background:radial-gradient(circle,var(--accent-2-soft),transparent 70%);
+    filter:blur(20px);pointer-events:none;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--accent);font-weight:600;margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);
+  }
+  .hero h1{
+    font-size:clamp(38px,6.4vw,74px);
+    line-height:1.04;font-weight:700;letter-spacing:-1.5px;
+    max-width:780px;
+  }
+  .hero h1 em{
+    font-style:normal;color:transparent;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;
+  }
+  .hero p.lead{
+    margin-top:24px;font-size:18px;line-height:1.6;color:var(--text-dim);
+    max-width:520px;
+  }
+  .hero-actions{display:flex;gap:14px;margin-top:38px;flex-wrap:wrap;}
+  .btn-primary{
+    padding:14px 28px;border-radius:100px;
+    background:linear-gradient(90deg,var(--accent),#ff5b78);
+    color:#fff;font-weight:600;font-size:15px;
+    box-shadow:0 8px 24px rgba(255,59,92,.28);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,59,92,.4);}
+  .btn-ghost{
+    padding:14px 28px;border-radius:100px;
+    border:1px solid var(--line);color:var(--text);
+    font-weight:600;font-size:15px;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .btn-ghost:hover{border-color:var(--text-faint);background:var(--surface);}
+
+  .hero-stats{
+    display:flex;gap:44px;margin-top:64px;flex-wrap:wrap;
+    padding-top:36px;border-top:1px solid var(--line);
+    max-width:640px;
+  }
+  .hero-stat b{display:block;font-size:26px;font-family:'Space Grotesk';font-weight:700;}
+  .hero-stat span{font-size:13px;color:var(--text-dim);}
+
+  .discount-banner{
+    display:inline-flex;align-items:center;gap:12px;margin-top:32px;
+    padding:12px 20px 12px 12px;border-radius:100px;
+    background:var(--surface);border:1px solid var(--accent-soft);
+    font-size:13.5px;color:var(--text-dim);flex-wrap:wrap;
+  }
+  .discount-banner a{color:var(--accent);font-weight:600;}
+  .discount-badge{
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff;font-size:12px;font-weight:700;letter-spacing:.3px;
+    padding:6px 14px;border-radius:100px;flex-shrink:0;
+  }
+
+  /* ---------- Section shell ---------- */
+  section{padding:100px 0;position:relative;}
+  .section-tag{
+    font-size:12.5px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--accent-2);font-weight:600;margin-bottom:14px;
+  }
+  .section-title{
+    font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-1px;
+    max-width:640px;
+  }
+  .section-sub{
+    color:var(--text-dim);font-size:16px;margin-top:14px;max-width:560px;line-height:1.6;
+  }
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  /* ---------- Tools marquee ---------- */
+  .marquee-track{
+    display:flex;gap:48px;white-space:nowrap;
+    animation:scroll-left 26s linear infinite;
+    font-family:'Space Grotesk';font-size:15px;color:var(--text-faint);
+    width:max-content;
+  }
+  .marquee-outer{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;margin-top:56px;}
+  .countries-outer{border-top:none;margin-top:0;}
+  .countries-track{font-size:17px;color:var(--text-dim);animation-duration:18s;animation-direction:reverse;}
+  .countries-track span::after{margin-left:36px;}
+  .marquee-track span{display:flex;align-items:center;gap:10px;}
+  .marquee-track span::after{content:'/';color:var(--accent);margin-left:48px;}
+  @keyframes scroll-left{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+
+  /* ---------- Pricing ---------- */
+  .pricing-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px;
+  }
+  @media (max-width:900px){.pricing-grid{grid-template-columns:1fr;}}
+  .price-card{
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius);padding:34px 28px;
+    display:flex;flex-direction:column;
+    transition:transform .3s ease, border-color .3s ease, background .3s ease;
+  }
+  .price-card:hover{transform:translateY(-6px);border-color:var(--text-faint);}
+  .price-card.featured{
+    background:linear-gradient(180deg,var(--surface-2),var(--surface));
+    border-color:var(--accent);position:relative;
+  }
+  .price-badge{
+    position:absolute;top:-13px;right:24px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.5px;
+    padding:6px 14px;border-radius:100px;text-transform:uppercase;
+  }
+  .price-card{position:relative;}
+  .price-badge.offer{left:24px;right:auto;background:linear-gradient(90deg,#ffb020,#ff7a3d);}
+  .priority-badge{right:24px;left:auto;}
+
+  .view-files-link{
+    align-self:flex-end;
+    margin-bottom:20px;
+    font-size:12px;font-weight:600;color:var(--accent-2);
+    padding:6px 12px;border-radius:100px;border:1px solid var(--line);
+    background:var(--surface-2);
+    transition:border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .view-files-link:hover{border-color:var(--accent-2);background:var(--accent-2-soft);color:var(--text);}
+  .featured .view-files-link{margin-top:8px;}
+  .market-price{
+    font-size:19px;color:var(--text-faint);font-weight:500;
+    margin-right:10px;text-decoration:line-through;
+  }
+  .sample-slot{margin-top:22px;}
+  .sample-thumb{
+    aspect-ratio:16/10;border-radius:12px;
+    background:linear-gradient(160deg,var(--surface-2),#0d0d10);
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .sample-thumb .play{
+    width:42px;height:42px;border-radius:50%;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sample-thumb .play::after{
+    content:'';border-style:solid;border-width:7px 0 7px 11px;
+    border-color:transparent transparent transparent #fff;margin-left:2px;
+  }
+  .sample-thumb .placeholder-label{
+    position:absolute;bottom:10px;left:12px;font-size:10.5px;color:var(--text-faint);
+  }
+  .sample-caption{display:block;margin-top:10px;font-size:12px;color:var(--text-dim);}
+  a.sample-request{cursor:pointer;transition:border-color .2s ease, background .2s ease;}
+  a.sample-request:hover{border-color:var(--accent);}
+  a.sample-request .placeholder-label{color:var(--accent-2);}
+
+  .bulk-block{
+    margin-top:36px;display:grid;grid-template-columns:0.9fr 1.1fr auto;gap:28px;align-items:center;
+    padding:32px;border-radius:var(--radius);
+    background:var(--surface);border:1px dashed var(--line);
+  }
+  @media (max-width:900px){.bulk-block{grid-template-columns:1fr;text-align:left;}}
+  .bulk-info h3{font-family:'Space Grotesk';font-size:19px;font-weight:600;margin-top:8px;max-width:420px;}
+  .bulk-info p{font-size:13.5px;color:var(--text-dim);margin-top:8px;max-width:420px;line-height:1.55;}
+
+  .bulk-slider-box{
+    background:var(--bg);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;
+  }
+  .bulk-readout{display:flex;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+  .bulk-readout-item{display:flex;flex-direction:column;gap:4px;}
+  .bulk-readout-label{font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--text-faint);}
+  .bulk-readout-value{font-family:'Space Grotesk';font-size:22px;font-weight:700;}
+  .bulk-readout-value.accent{
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .bulk-slider{
+    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:100px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    outline:none;cursor:pointer;
+  }
+  .bulk-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;
+    background:#fff;border:3px solid var(--accent);cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.4);
+  }
+  .bulk-slider::-moz-range-thumb{
+    width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;
+  }
+  .bulk-slider-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:var(--text-faint);}
+  .bulk-basis{display:block;margin-top:14px;font-size:11px;color:var(--text-faint);}
+  .tier-name{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);font-weight:600;}
+  .tier-price{font-family:'Space Grotesk';font-size:40px;font-weight:700;margin-top:12px;}
+  .tier-price sub{font-size:15px;color:var(--text-dim);font-weight:500;}
+  .tier-list{list-style:none;margin-top:24px;display:flex;flex-direction:column;gap:12px;flex-grow:1;}
+  .tier-list li{font-size:14.5px;color:var(--text-dim);display:flex;gap:10px;align-items:flex-start;}
+  .tier-list li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;}
+  .tier-cta{
+    margin-top:26px;text-align:center;padding:12px;border-radius:100px;
+    border:1px solid var(--line);font-weight:600;font-size:14px;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .price-card.featured .tier-cta{background:var(--accent);border-color:var(--accent);}
+  .tier-cta:hover{border-color:var(--text-faint);}
+  .price-note{
+    margin-top:28px;font-size:13.5px;color:var(--text-faint);
+    border-left:2px solid var(--accent-2);padding-left:14px;max-width:640px;line-height:1.6;
+  }
+
+  .ai-note-banner{
+    margin-top:36px;display:flex;align-items:center;gap:14px;
+    padding:20px 26px;border-radius:var(--radius);
+    background:linear-gradient(90deg,var(--accent-soft),var(--accent-2-soft));
+    border:1px solid var(--accent-soft);
+    font-size:14.5px;color:var(--text);font-weight:500;line-height:1.5;
+  }
+  .ai-note-icon{font-size:20px;flex-shrink:0;}
+
+  .addon-row{
+    display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;
+  }
+  .addon-chip{
+    padding:10px 20px;border-radius:100px;border:1px solid var(--line);
+    font-size:13.5px;color:var(--text-dim);background:var(--surface);
+  }
+
+  .shoot-block{
+    margin-top:36px;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center;
+    padding:36px;border-radius:var(--radius);position:relative;
+    background:linear-gradient(120deg,var(--surface),var(--surface-2));
+    border:1px solid var(--line);
+  }
+  @media (max-width:760px){.shoot-block{grid-template-columns:1fr;text-align:left;}}
+  .shoot-info h3{font-family:'Space Grotesk';font-size:22px;font-weight:600;margin-top:10px;max-width:420px;}
+  .shoot-info .tier-list{margin-top:18px;}
+  .shoot-price{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:24px 32px;border-radius:14px;background:var(--bg);border:1px solid var(--line);
+    text-align:center;min-width:180px;
+  }
+  .shoot-amount{font-family:'Space Grotesk';font-size:34px;font-weight:700;color:var(--accent);}
+  .shoot-sub{font-size:12.5px;color:var(--text-dim);}
+  .shoot-market{display:block;font-size:15px;margin-right:0;}
+  .shoot-price .tier-cta{margin-top:14px;width:100%;}
+
+  /* ---------- Recent work ---------- */
+  .work-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:52px;
+  }
+  @media (max-width:900px){.work-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:600px){.work-grid{grid-template-columns:1fr;}}
+  .work-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;transition:transform .3s ease, border-color .3s ease;
+  }
+  .work-card:hover{transform:translateY(-5px);border-color:var(--text-faint);}
+  .work-thumb{
+    aspect-ratio:9/13;background:linear-gradient(160deg,var(--surface-2),#0d0d10);
+    display:flex;align-items:center;justify-content:center;position:relative;
+    cursor:pointer;overflow:hidden;
+  }
+  .yt-thumb-img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    filter:brightness(.65);
+  }
+  .work-thumb iframe{
+    position:absolute;inset:0;width:100%;height:100%;border:0;
+  }
+  .work-thumb .play{
+    width:52px;height:52px;border-radius:50%;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(6px);
+  }
+  .work-thumb .play::after{
+    content:'';border-style:solid;border-width:8px 0 8px 13px;
+    border-color:transparent transparent transparent #fff;margin-left:3px;
+  }
+  .work-thumb .placeholder-label{
+    position:absolute;bottom:14px;left:14px;right:14px;
+    font-size:11.5px;color:var(--text-faint);letter-spacing:.4px;
+  }
+  .work-tag{
+    position:absolute;top:14px;left:14px;
+    background:rgba(10,10,12,.7);backdrop-filter:blur(6px);
+    padding:5px 12px;border-radius:100px;font-size:11px;font-weight:600;
+    letter-spacing:.4px;text-transform:uppercase;color:var(--accent);
+    border:1px solid var(--accent-soft);
+  }
+  .work-body{padding:18px 18px 22px;}
+  .work-body h4{font-family:'Space Grotesk';font-size:16px;font-weight:600;}
+  .work-body p{font-size:13.5px;color:var(--text-dim);margin-top:6px;line-height:1.5;}
+
+  /* ---------- Proof ---------- */
+  .proof-block{
+    background:var(--surface);border:1px solid var(--line);border-radius:24px;
+    padding:44px 36px;margin-top:24px;
+  }
+  .proof-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:30px;}
+  .proof-head h3{font-family:'Space Grotesk';font-size:20px;font-weight:600;}
+  .proof-source{font-size:12.5px;color:var(--text-faint);}
+  .proof-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;}
+  @media (max-width:800px){.proof-stats{grid-template-columns:1fr 1fr;}}
+  .proof-body{display:grid;grid-template-columns:180px 1fr;gap:30px;align-items:center;}
+  @media (max-width:700px){.proof-body{grid-template-columns:1fr;}}
+  .proof-shot{
+    width:100%;border-radius:14px;border:1px solid var(--line);
+    display:block;object-fit:cover;
+  }
+  .reel-link{
+    display:inline-flex;align-items:center;gap:6px;margin-top:24px;
+    font-size:13.5px;font-weight:600;color:var(--accent);
+  }
+  .reel-link:hover{text-decoration:underline;}
+  .proof-stat b{
+    display:block;font-family:'Space Grotesk';font-size:30px;font-weight:700;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .proof-stat span{font-size:12.5px;color:var(--text-dim);letter-spacing:.3px;}
+  .proof-divider{height:1px;background:var(--line);margin:36px 0;}
+
+  .growth-strip{
+    display:flex;align-items:center;gap:28px;flex-wrap:wrap;
+    margin-top:56px;padding:28px;border-radius:var(--radius);
+    background:linear-gradient(90deg,var(--accent-soft),var(--accent-2-soft));
+    border:1px solid var(--line);
+  }
+  .growth-strip b{font-family:'Space Grotesk';font-size:26px;}
+  .growth-strip span{color:var(--text-dim);font-size:14px;}
+
+  /* ---------- Additional services ---------- */
+  .services-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:52px;}
+  @media (max-width:820px){.services-row{grid-template-columns:1fr;}}
+  .service-card{
+    padding:28px;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--surface);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, background .35s ease, box-shadow .35s ease;
+  }
+  .service-card:hover, .service-card:active{
+    transform:translateY(-8px) scale(1.02);
+    border-color:var(--accent);
+    background:linear-gradient(160deg,var(--surface-2),var(--surface));
+    box-shadow:0 16px 34px rgba(0,0,0,.35);
+  }
+  .service-card .num{
+    font-family:'Space Grotesk';color:var(--accent);font-size:13px;font-weight:600;
+    display:inline-block;transition:transform .35s ease;
+  }
+  .service-card:hover .num, .service-card:active .num{transform:translateX(4px);}
+  .service-card h4{font-family:'Space Grotesk';font-size:19px;margin-top:12px;font-weight:600;}
+  .service-card p{font-size:14px;color:var(--text-dim);margin-top:8px;line-height:1.55;}
+
+  /* ---------- About founder ---------- */
+  .about-block{
+    display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center;margin-top:52px;
+  }
+  @media (max-width:700px){.about-block{grid-template-columns:1fr;}}
+  .avatar-ring{
+    width:130px;height:130px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    padding:3px;flex-shrink:0;display:block;
+  }
+  .avatar-ring .avatar-inner{
+    width:100%;height:100%;border-radius:50%;
+    background:var(--surface-2);display:flex;align-items:center;justify-content:center;
+    font-family:'Space Grotesk';font-size:30px;font-weight:700;color:var(--text-dim);
+  }
+  .about-copy h4{font-family:'Space Grotesk';font-size:20px;font-weight:600;}
+  .about-copy p{color:var(--text-dim);font-size:14.5px;margin-top:8px;line-height:1.6;max-width:520px;}
+
+  /* ---------- Footer / contact ---------- */
+  footer{
+    padding:100px 0 60px;position:relative;
+  }
+  .footer-cta{
+    text-align:center;max-width:640px;margin:0 auto;
+  }
+  .footer-cta h2{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:-1px;}
+  .footer-cta p{color:var(--text-dim);margin-top:16px;font-size:16px;}
+  .contact-links{
+    display:flex;justify-content:center;gap:16px;margin-top:18px;flex-wrap:wrap;
+  }
+  .contact-pill{
+    display:flex;align-items:center;gap:9px;
+    padding:12px 22px;border-radius:100px;border:1px solid var(--line);
+    font-size:14px;font-weight:600;transition:border-color .2s, background .2s;
+  }
+  .contact-pill:hover{border-color:var(--text-faint);background:var(--surface);}
+  .contact-pill.whatsapp{background:var(--accent);border-color:var(--accent);}
+  .whatsapp-cta{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    margin:36px auto 0;max-width:360px;
+    padding:20px 36px;border-radius:100px;
+    background:linear-gradient(90deg,var(--accent),#ff5b78);
+    color:#fff;font-weight:700;font-size:18px;
+    box-shadow:0 12px 34px rgba(255,59,92,.35);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .whatsapp-cta:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(255,59,92,.48);}
+  .lead-form{
+    margin:36px auto 0;max-width:460px;text-align:left;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:28px;
+  }
+  .lead-form-title{font-family:'Space Grotesk';font-size:15px;font-weight:600;margin-bottom:4px;}
+  .lead-form-sub{font-size:13px;color:var(--text-dim);margin-bottom:18px;}
+  .lead-field{margin-bottom:14px;}
+  .lead-field label{display:block;font-size:12px;color:var(--text-faint);margin-bottom:6px;letter-spacing:.3px;}
+  .lead-field input, .lead-field select{
+    width:100%;padding:12px 14px;border-radius:10px;
+    background:var(--bg);border:1px solid var(--line);color:var(--text);
+    font-family:'Inter';font-size:14px;outline:none;
+    transition:border-color .2s ease;
+  }
+  .lead-field input:focus, .lead-field select:focus{border-color:var(--accent);}
+  .lead-submit{
+    width:100%;margin-top:6px;padding:14px;border:none;border-radius:100px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#fff;font-weight:700;font-size:14.5px;cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .lead-submit:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(255,59,92,.3);}
+  .lead-form-note{font-size:11.5px;color:var(--text-faint);margin-top:10px;text-align:center;}
+  .lead-divider{
+    display:flex;align-items:center;gap:14px;margin:32px auto 0;max-width:360px;
+    color:var(--text-faint);font-size:12px;
+  }
+  .lead-divider::before,.lead-divider::after{content:'';flex:1;height:1px;background:var(--line);}
+
+  .foot-bottom{
+    margin-top:90px;display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:14px;padding-top:26px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--text-faint);
+  }
+  /* ---------- Funnel additions ---------- */
+  .center{text-align:center;margin-left:auto;margin-right:auto;}
+  .hero-center .wrap{display:flex;flex-direction:column;align-items:center;}
+  .hero-center h1{max-width:820px;}
+  .hero-center .lead{max-width:560px;}
+  .hero-center .hero-actions{justify-content:center;}
+  .hero-center .hero-stats{justify-content:center;border-top:1px solid var(--line);max-width:640px;}
+
+  /* Hero entrance video card */
+  .hero-video{
+    width:min(300px,78vw);
+    margin:46px auto 8px;
+  }
+  .hero-video .work-thumb{
+    aspect-ratio:9/16;
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+  .hero-video-cap{
+    display:block;text-align:center;margin-top:12px;
+    font-size:12.5px;color:var(--text-dim);letter-spacing:.3px;
+  }
+
+  .big-video-section{padding-top:70px;}
+  .big-video-frame{
+    max-width:380px;margin:44px auto 0;
+  }
+  .big-video-frame .work-thumb{
+    border-radius:var(--radius);border:1px solid var(--line);
+    box-shadow:0 20px 50px rgba(0,0,0,.45);
+  }
+  .big-video-cta{margin-top:36px;}
+
+  .work-grid.compact{grid-template-columns:repeat(2,1fr);max-width:760px;margin-left:auto;margin-right:auto;}
+  @media (max-width:600px){.work-grid.compact{grid-template-columns:1fr;}}
+
+  .about-ig-link{display:inline-flex;margin-top:28px;}
+
+  /* ---------- Sample reels 3D coverflow ---------- */
+  .reel-stage{
+    position:relative;margin-top:54px;
+    padding:26px 0 6px;
+    perspective:1700px;
+    overflow:hidden;
+  }
+  .reel-stage::before{
+    content:'';position:absolute;top:46%;left:50%;
+    width:min(600px,86vw);height:min(600px,86vw);
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle,var(--accent-2-soft),var(--accent-soft) 42%,transparent 70%);
+    filter:blur(34px);pointer-events:none;z-index:0;
+  }
+  .reel-track{
+    position:relative;z-index:1;height:430px;
+    transform-style:preserve-3d;outline:none;
+  }
+  .reel-card{
+    position:absolute;top:50%;left:50%;
+    width:210px;height:374px;margin:-187px 0 0 -105px;
+    border-radius:16px;overflow:hidden;
+    border:1px solid var(--line);
+    background:linear-gradient(160deg,var(--surface-2),#0d0d10);
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+    cursor:pointer;
+    transition:transform .55s cubic-bezier(.2,.8,.2,1), opacity .5s ease, box-shadow .35s ease, border-color .35s ease;
+    will-change:transform,opacity;backface-visibility:hidden;
+  }
+  .reel-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  .reel-card iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .reel-card .rc-shade{
+    position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.5));
+    transition:opacity .4s ease;
+  }
+  .reel-card .rc-tag{
+    position:absolute;top:12px;left:12px;z-index:2;
+    background:rgba(10,10,12,.7);backdrop-filter:blur(6px);
+    padding:5px 11px;border-radius:100px;font-size:10.5px;font-weight:600;
+    letter-spacing:.4px;text-transform:uppercase;color:var(--accent);
+    border:1px solid var(--accent-soft);
+  }
+  .reel-card .play{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:48px;height:48px;border-radius:50%;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
+    display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);
+    transition:width .35s ease, height .35s ease, background .3s ease;
+  }
+  .reel-card .play::after{
+    content:'';border-style:solid;border-width:8px 0 8px 13px;
+    border-color:transparent transparent transparent #fff;margin-left:3px;
+  }
+  .reel-card.active{border-color:var(--accent);box-shadow:0 28px 72px rgba(255,59,92,.3);}
+  .reel-card.active .rc-shade{opacity:.35;}
+  .reel-card:not(.active) .play{width:38px;height:38px;background:rgba(255,255,255,.06);}
+
+  .reel-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px;}
+  .reel-arrow{
+    width:46px;height:46px;border-radius:50%;
+    border:1px solid var(--line);background:var(--surface);color:var(--text);
+    font-size:20px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .2s ease, background .2s ease, transform .2s ease;
+  }
+  .reel-arrow:hover{border-color:var(--accent);background:var(--surface-2);transform:translateY(-2px);}
+  .reel-dots{display:flex;gap:9px;align-items:center;}
+  .reel-dot{
+    width:8px;height:8px;padding:0;border:none;border-radius:50%;
+    background:var(--line);cursor:pointer;transition:background .25s ease, transform .25s ease;
+  }
+  .reel-dot.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));transform:scale(1.4);}
+  .reel-hint{display:block;text-align:center;margin-top:18px;font-size:12.5px;color:var(--text-dim);}
+  @media (max-width:640px){
+    .reel-track{height:372px;}
+    .reel-card{width:172px;height:306px;margin:-153px 0 0 -86px;}
+  }
+
+  /* ---------- Instagram 3D bio card ---------- */
+  .ig-stage{
+    position:relative;margin-top:54px;
+    display:flex;justify-content:center;
+    padding:40px 0 20px;perspective:1500px;
+  }
+  .ig-stage::before{
+    content:'';position:absolute;top:50%;left:50%;
+    width:min(640px,88vw);height:380px;transform:translate(-50%,-50%);
+    background:radial-gradient(circle,var(--accent-soft),var(--accent-2-soft) 40%,transparent 70%);
+    filter:blur(40px);pointer-events:none;z-index:0;
+  }
+  .ig-float{
+    position:relative;z-index:1;transform-style:preserve-3d;
+    animation:ig-float 5.5s ease-in-out infinite;
+  }
+  @keyframes ig-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .ig-card{
+    display:block;width:min(430px,90vw);
+    background:linear-gradient(158deg,#1d1d24,#101014);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;padding:22px 24px 18px;color:var(--text);
+    box-shadow:0 44px 90px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.07);
+    transform:rotateY(-19deg) rotateX(7deg);
+    transition:transform .6s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease;
+  }
+  .ig-card:hover{
+    transform:rotateY(-6deg) rotateX(2deg);
+    box-shadow:0 50px 100px rgba(0,0,0,.7), 0 0 0 1px var(--accent-soft), inset 0 1px 0 rgba(255,255,255,.09);
+  }
+  .ig-audio-pill{
+    display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;
+    background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);
+    border-radius:100px;padding:6px 13px;font-size:11.5px;color:var(--text);
+    max-width:100%;
+  }
+  .ig-eq{display:inline-flex;align-items:flex-end;gap:2px;height:12px;}
+  .ig-eq i{width:2.5px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent-2));animation:ig-eq 1s ease-in-out infinite;}
+  .ig-eq i:nth-child(1){height:6px;animation-delay:0s}
+  .ig-eq i:nth-child(2){height:12px;animation-delay:.18s}
+  .ig-eq i:nth-child(3){height:8px;animation-delay:.36s}
+  @keyframes ig-eq{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+  .ig-top{display:flex;align-items:center;gap:26px;}
+  .ig-avatar-wrap{position:relative;flex-shrink:0;}
+  .ig-ring{
+    width:80px;height:80px;border-radius:50%;padding:3px;
+    background:conic-gradient(from 20deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ig-avatar{
+    width:100%;height:100%;border-radius:50%;border:3px solid #141418;
+    background:linear-gradient(135deg,#2b2b31,#151519);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Space Grotesk';font-weight:700;font-size:22px;color:var(--text-dim);
+  }
+  .ig-add{
+    position:absolute;bottom:0;right:0;
+    width:22px;height:22px;border-radius:50%;background:#0095f6;color:#fff;
+    font-size:15px;line-height:1;font-weight:600;
+    display:flex;align-items:center;justify-content:center;border:2px solid #141418;
+  }
+  .ig-stats{display:flex;gap:20px;}
+  .ig-stat{text-align:center;}
+  .ig-stat b{display:block;font-family:'Space Grotesk';font-size:18px;font-weight:700;}
+  .ig-stat span{font-size:12px;color:var(--text-dim);}
+  .ig-bio{margin-top:16px;}
+  .ig-name{font-weight:700;font-size:14.5px;margin-bottom:4px;}
+  .ig-bio-line{font-size:13px;color:var(--text-dim);line-height:1.55;}
+  .ig-bio-line.ig-handle{color:var(--accent);font-weight:600;margin-top:2px;}
+  .ig-reel-row{
+    display:flex;align-items:center;gap:9px;margin-top:16px;
+    padding-top:14px;border-top:1px solid rgba(255,255,255,.07);
+    font-size:12.5px;color:var(--text-dim);
+  }
+  .ig-reel-play{
+    width:18px;height:18px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;
+  }
+  @media (max-width:520px){
+    .ig-card{transform:rotateY(-12deg) rotateX(5deg);padding:20px;}
+    .ig-top{gap:18px;}
+    .ig-ring{width:70px;height:70px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wave-progress" id="waveProgress"></div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">KAMESH<span>CREATES</span></div>
+    <div class="nav-links">
+      <a href="#video">Sample</a>
+      <a href="#proof">Proof</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <a href="#contact" class="nav-cta">Get a Quote</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile-panel" id="navMobilePanel">
+    <a href="#video">Sample</a>
+    <a href="#proof">Proof</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero hero-center">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="eyebrow center">Reel Creation · AI-Powered Editing</div>
+    <h1 class="center">Reels that <em>stop the scroll.</em></h1>
+    <p class="lead center">Hook-driven reel editing for creators and businesses — blending sharp storytelling with AI-powered tools. Scripted, edited and delivered, ready to post.</p>
+    <div class="hero-actions center">
+      <a href="#contact" class="btn-primary">Get My First Edit →</a>
+      <a href="#video" class="btn-ghost">Watch a Sample</a>
+    </div>
+
+    <div class="hero-video" id="video">
+      <div class="work-thumb vimeo-facade" data-vimeo-id="1212408273">
+        <span class="work-tag">Sample Reel</span>
+        <img class="yt-thumb-img" src="https://i.vimeocdn.com/video/2182827445-ca4a604aafe123fe38ecb1deec8847a828b8d08d310d5df98ecb0e84a3c3b781-d_640x1138?region=us" alt="Sample reel edit preview">
+        <div class="play"></div>
+      </div>
+      <span class="hero-video-cap">▶ Tap to watch — sound on</span>
+    </div>
+
+    <div class="hero-stats center">
+      <div class="hero-stat"><b>27K+</b><span>Instagram Followers</span></div>
+      <div class="hero-stat"><b>5.0M+</b><span>Views in Last 30 Days</span></div>
+      <div class="hero-stat"><b>3+ yrs</b><span>Editing Experience</span></div>
+      <div class="hero-stat"><b>48 hrs</b><span>Standard Delivery</span></div>
+    </div>
+  </div>
+</section>
+<!-- TOOLS MARQUEE -->
+<div class="wrap">
+  <div class="marquee-outer">
+    <div class="marquee-track" id="marqueeTrack">
+      <span>Premiere Pro</span><span>After Effects</span><span>HeyGen</span><span>Captions.ai</span>
+      <span>ElevenLabs</span><span>Submagic</span><span>Higgsfield</span><span>OpenArt</span>
+      <span>Google Flow</span><span>Opus Clip</span>
+    </div>
+  </div>
+</div>
+
+<!-- COUNTRIES MARQUEE -->
+<div class="wrap">
+  <div class="marquee-outer countries-outer">
+    <div class="marquee-track countries-track" id="countriesTrack">
+      <span>🇮🇳 India</span><span>🇨🇦 Canada</span><span>🇲🇾 Malaysia</span><span>🇺🇸 USA</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROOF / INSTAGRAM BIO CARD -->
+<section id="proof">
+  <div class="wrap">
+    <div class="section-tag reveal center">Live on Instagram</div>
+    <h2 class="section-title reveal center">Built in public — 27K+ and counting.</h2>
+    <p class="section-sub reveal center">The same editing style you'll get, growing <a href="https://instagram.com/kameshcreates" target="_blank" style="color:var(--accent)">@kameshcreates</a> every single day.</p>
+
+    <div class="ig-stage reveal">
+      <div class="ig-float">
+        <a href="https://instagram.com/kameshcreates" target="_blank" class="ig-card" aria-label="@kameshcreates on Instagram">
+          <div class="ig-audio-pill">
+            <span class="ig-eq"><i></i><i></i><i></i></span>
+            Reels that stop the scroll
+          </div>
+          <div class="ig-top">
+            <div class="ig-avatar-wrap">
+              <div class="ig-ring"><div class="ig-avatar">KC</div></div>
+              <span class="ig-add">+</span>
+            </div>
+            <div class="ig-stats">
+              <div class="ig-stat"><b>142</b><span>posts</span></div>
+              <div class="ig-stat"><b>27K</b><span>followers</span></div>
+              <div class="ig-stat"><b>88</b><span>following</span></div>
+            </div>
+          </div>
+          <div class="ig-bio">
+            <div class="ig-name">KameshCreates ⚡</div>
+            <div class="ig-bio-line">🎬 Reel Editor · AI-Powered Edits</div>
+            <div class="ig-bio-line">Hook-driven storytelling that stops the scroll 🌀🦋</div>
+            <div class="ig-bio-line ig-handle">📩 DM to book your first edit 💜</div>
+          </div>
+          <div class="ig-reel-row">
+            <span class="ig-reel-play">▶</span>
+            <span>Reels that stop the scroll • @kameshcreates</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <a href="https://instagram.com/kameshcreates" target="_blank" class="btn-ghost reveal" style="margin:30px auto 0;display:block;width:fit-content;">Follow @kameshcreates on Instagram ↗</a>
+  </div>
+</section>
+
+<!-- SAMPLE REELS SHOWCASE -->
+<section id="reels">
+  <div class="wrap">
+    <div class="section-tag reveal center">Sample Reels</div>
+    <h2 class="section-title reveal center">A wall of scroll-stopping edits.</h2>
+    <p class="section-sub reveal center">Browse with the arrows, then tap the center card to watch — sound on.</p>
+  </div>
+
+  <div class="reel-stage reveal">
+    <div class="reel-track" id="reelTrack" aria-label="Sample reels carousel">
+      <div class="reel-card" data-vimeo-id="1212895045" data-tag="Cinematic" data-poster="https://i.vimeocdn.com/video/2183440244-6b1afe534b5b0b9651bfb6b048a74d32f99d925826bf3ae03ee6736cd0d92f59-d_640x1138?region=us">
+        <span class="rc-tag">Cinematic</span>
+        <img src="https://i.vimeocdn.com/video/2183440244-6b1afe534b5b0b9651bfb6b048a74d32f99d925826bf3ae03ee6736cd0d92f59-d_640x1138?region=us" alt="Sample reel">
+        <div class="rc-shade"></div>
+        <div class="play"></div>
+      </div>
+      <div class="reel-card" data-vimeo-id="1212895046" data-tag="Motion Graphics" data-poster="https://i.vimeocdn.com/video/2183440279-2d7e340aed365510adf6cbaeb51c8331b06ea158dcb752062eafe32809ca0f84-d_640x1138?region=us">
+        <span class="rc-tag">Motion Graphics</span>
+        <img src="https://i.vimeocdn.com/video/2183440279-2d7e340aed365510adf6cbaeb51c8331b06ea158dcb752062eafe32809ca0f84-d_640x1138?region=us" alt="Sample reel">
+        <div class="rc-shade"></div>
+        <div class="play"></div>
+      </div>
+      <div class="reel-card" data-vimeo-id="1212895048" data-tag="Brand Reel" data-poster="https://i.vimeocdn.com/video/2183440431-987621b051e80086e02f447c8f1111c374a04c926f2653d7d0765932d6dee0d8-d_640x1138?region=us">
+        <span class="rc-tag">Brand Reel</span>
+        <img src="https://i.vimeocdn.com/video/2183440431-987621b051e80086e02f447c8f1111c374a04c926f2653d7d0765932d6dee0d8-d_640x1138?region=us" alt="Sample reel">
+        <div class="rc-shade"></div>
+        <div class="play"></div>
+      </div>
+      <div class="reel-card" data-vimeo-id="1212895044" data-tag="Add-ons" data-poster="https://i.vimeocdn.com/video/2183440389-a9cb98462fa8fe9d1f16ab11a5d242b2159187e6ee1e329ea0c2489f830b200e-d_640x1138?region=us">
+        <span class="rc-tag">Add-ons</span>
+        <img src="https://i.vimeocdn.com/video/2183440389-a9cb98462fa8fe9d1f16ab11a5d242b2159187e6ee1e329ea0c2489f830b200e-d_640x1138?region=us" alt="Sample reel">
+        <div class="rc-shade"></div>
+        <div class="play"></div>
+      </div>
+      <div class="reel-card" data-vimeo-id="1212408273" data-tag="AI Edit" data-poster="https://i.vimeocdn.com/video/2182827445-ca4a604aafe123fe38ecb1deec8847a828b8d08d310d5df98ecb0e84a3c3b781-d_640x1138?region=us">
+        <span class="rc-tag">AI Edit</span>
+        <img src="https://i.vimeocdn.com/video/2182827445-ca4a604aafe123fe38ecb1deec8847a828b8d08d310d5df98ecb0e84a3c3b781-d_640x1138?region=us" alt="Sample reel">
+        <div class="rc-shade"></div>
+        <div class="play"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reel-nav">
+    <button class="reel-arrow" id="reelPrev" aria-label="Previous reel">‹</button>
+    <div class="reel-dots" id="reelDots"></div>
+    <button class="reel-arrow" id="reelNext" aria-label="Next reel">›</button>
+  </div>
+  <span class="reel-hint">Every card is a real edit — tap to watch the full reel.</span>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-tag reveal">Services & Pricing</div>
+    <h2 class="section-title reveal">Pick the tier that fits your content.</h2>
+    <p class="section-sub reveal">Every package includes hook-driven editing, sound design and platform-ready exports — delivered fast.</p>
+
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <span class="price-badge offer">Launch Offer</span>
+        <a href="https://drive.google.com/drive/folders/10D3KRftXwO84V_Bxkym_nfmPg7r-olRk?usp=sharing" target="_blank" class="view-files-link">View Full Files ↗</a>
+        <div class="tier-name">Minimal</div>
+        <div class="tier-price"><s class="market-price">₹2,599</s>₹1,299</div>
+        <ul class="tier-list">
+          <li>Video duration: Up to 40 secs</li>
+          <li>Clean cut editing</li>
+          <li>Basic color correction</li>
+          <li>Basic audio cleanup & volume balancing</li>
+          <li>Royalty-free background music</li>
+          <li>Basic text & captions</li>
+          <li>Simple transitions</li>
+          <li>Logo add (if client provides)</li>
+          <li>1080p Full HD export</li>
+        </ul>
+        <a href="#contact" class="tier-cta">Choose Minimal</a>
+      </div>
+
+      <div class="price-card reveal">
+        <span class="price-badge offer">Launch Offer</span>
+        <a href="https://drive.google.com/drive/folders/15OexFY0TADmfK1PXxYCoCux4osQUXxiR?usp=sharing" target="_blank" class="view-files-link">View Full Files ↗</a>
+        <div class="tier-name">Standard</div>
+        <div class="tier-price"><s class="market-price">₹2,999</s>₹1,999</div>
+        <ul class="tier-list">
+          <li>Up to 60 seconds video</li>
+          <li>Cinematic color grading</li>
+          <li>Smooth & premium transitions</li>
+          <li>Animated captions (basic motion)</li>
+          <li>Sound design (whoosh, hits, ambience)</li>
+          <li>Zooms & dynamic camera movement</li>
+          <li>Motion graphics (basic)</li>
+          <li>Background noise cleanup</li>
+          <li>2 free revisions</li>
+          <li>24–48 hour delivery</li>
+          <li>1080p Full HD export</li>
+        </ul>
+        <a href="#contact" class="tier-cta">Choose Standard</a>
+      </div>
+
+      <div class="price-card featured reveal">
+        <span class="price-badge offer">Launch Offer</span>
+        <span class="price-badge priority-badge">Priority</span>
+        <a href="https://drive.google.com/drive/folders/1_lWT7aFQ-KEn-hD_tWLtBnq15G7N9u-r?usp=sharing" target="_blank" class="view-files-link featured-link">View Full Files ↗</a>
+        <div class="tier-name">High</div>
+        <div class="tier-price"><s class="market-price">₹4,999</s>₹2,999</div>
+        <ul class="tier-list">
+          <li>Up to 1 min 30 secs video</li>
+          <li>Premium cinematic color grading</li>
+          <li>Advanced motion graphics</li>
+          <li>Custom animated captions</li>
+          <li>Professional sound design & audio enhancement</li>
+          <li>Advanced speed ramps</li>
+          <li>Object tracking & masking</li>
+          <li>Dynamic text animations</li>
+          <li>Light VFX / visual effects</li>
+          <li>Smooth keyframe animations</li>
+          <li>High-end transitions</li>
+          <li>4K export (if source supports)</li>
+          <li>3 free revisions</li>
+          <li>Priority delivery (24 hours)</li>
+        </ul>
+        <a href="#contact" class="tier-cta">Choose High</a>
+      </div>
+    </div>
+
+    <p class="price-note reveal">Pricing may vary depending on project complexity — final quote shared after a brief discussion.</p>
+
+    <div class="shoot-block reveal">
+      <span class="price-badge offer">Launch Offer</span>
+      <div class="shoot-info">
+        <div class="tier-name">On-Location Shoot</div>
+        <h3>We shoot it too — not just edit it.</h3>
+        <ul class="tier-list">
+          <li>Full on-location shoot</li>
+          <li>High-quality camera & mic setup</li>
+          <li>Editing handled in-house by our team</li>
+          <li>Perfect for events, interviews & brand shoots</li>
+        </ul>
+      </div>
+      <div class="shoot-price">
+        <s class="market-price shoot-market">₹3,999 (8 hrs)</s>
+        <span class="shoot-amount">₹1,999</span>
+        <span class="shoot-sub">launch offer price</span>
+        <a href="#contact" class="tier-cta">Book a Shoot</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="wave-divider"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="wrap">
+    <div class="footer-cta reveal">
+      <h2>Let's create something great together.</h2>
+      <p>Send your brief, pick a tier, and get your first edit within 48 hours.</p>
+
+      <form class="lead-form reveal" id="leadForm">
+        <div class="lead-form-title">Tell us what you need</div>
+        <div class="lead-form-sub">We'll open WhatsApp with your details pre-filled — just hit send.</div>
+        <div class="lead-field">
+          <label for="leadName">Your name</label>
+          <input type="text" id="leadName" required placeholder="e.g. Arjun">
+        </div>
+        <div class="lead-field">
+          <label for="leadPhone">WhatsApp number</label>
+          <input type="tel" id="leadPhone" required placeholder="e.g. 98765 43210">
+        </div>
+        <div class="lead-field">
+          <label for="leadService">What do you need?</label>
+          <select id="leadService">
+            <option>Reel Editing — Minimal (₹1,299)</option>
+            <option>Reel Editing — Standard (₹1,999)</option>
+            <option>Reel Editing — High (₹2,999)</option>
+            <option>AI Edit / AI Film</option>
+            <option>Bulk Orders (10+ videos)</option>
+            <option>On-Location Shoot</option>
+            <option>Not sure yet — need advice</option>
+          </select>
+        </div>
+        <button type="submit" class="lead-submit">Send via WhatsApp →</button>
+        <div class="lead-form-note">No spam — this just opens a pre-filled WhatsApp chat with us.</div>
+      </form>
+
+      <div class="lead-divider reveal">or reach us directly</div>
+
+      <a href="https://wa.me/919361835754" class="whatsapp-cta reveal">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.031 0C5.421 0 .06 5.36.06 11.972c0 2.11.55 4.166 1.596 5.983L0 24l6.19-1.624a11.945 11.945 0 0 0 5.838 1.487h.005c6.61 0 11.972-5.361 11.972-11.972C24.005 5.281 18.641 0 12.03 0zm0 21.902h-.004a9.928 9.928 0 0 1-5.06-1.386l-.363-.215-3.674.963.98-3.583-.236-.368a9.94 9.94 0 0 1-1.526-5.34c0-5.494 4.472-9.966 9.966-9.966 2.66 0 5.16 1.036 7.04 2.918a9.897 9.897 0 0 1 2.918 7.049c0 5.494-4.472 9.966-9.966 9.966z"/></svg>
+        Message on WhatsApp
+      </a>
+      <div class="contact-links">
+        <a href="https://instagram.com/kameshcreates" class="contact-pill">Instagram — @kameshcreates</a>
+        <a href="mailto:kameshvgvk406@gmail.com" class="contact-pill">Email</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 KameshCreates. All rights reserved.</span>
+      <span>+91 93618 35754 · +91 93608 35754 · kameshvgvk406@gmail.com</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Lead capture form -> pre-filled WhatsApp message
+  const leadForm = document.getElementById('leadForm');
+  leadForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('leadName').value.trim();
+    const phone = document.getElementById('leadPhone').value.trim();
+    const service = document.getElementById('leadService').value;
+    const message = `Hi, I'm ${name} (${phone}). I'm interested in: ${service}. Please share more details.`;
+    window.open(`https://wa.me/919361835754?text=${encodeURIComponent(message)}`, '_blank');
+  });
+
+  // Mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navMobilePanel = document.getElementById('navMobilePanel');
+  navToggle.addEventListener('click', () => {
+    const isOpen = navMobilePanel.classList.toggle('open');
+    navToggle.classList.toggle('open', isOpen);
+    navToggle.setAttribute('aria-expanded', isOpen);
+  });
+  navMobilePanel.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      navMobilePanel.classList.remove('open');
+      navToggle.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Scroll progress bar (waveform signature)
+  const progress = document.getElementById('waveProgress');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progress.style.width = scrolled + '%';
+  });
+
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, {threshold:0.15});
+  revealEls.forEach(el => io.observe(el));
+
+  // Count-up stats
+  const counters = document.querySelectorAll('[data-count]');
+  const countIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        const el = e.target;
+        const target = parseInt(el.dataset.count, 10);
+        const duration = 1400;
+        const start = performance.now();
+        function tick(now){
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString('en-IN');
+          if(p < 1) requestAnimationFrame(tick);
+          else el.textContent = target.toLocaleString('en-IN');
+        }
+        requestAnimationFrame(tick);
+        countIO.unobserve(el);
+      }
+    });
+  }, {threshold:0.4});
+  counters.forEach(c => countIO.observe(c));
+
+  // Marquee duplicate for seamless loop
+  const track = document.getElementById('marqueeTrack');
+  track.innerHTML += track.innerHTML;
+
+  const countriesTrack = document.getElementById('countriesTrack');
+  countriesTrack.innerHTML += countriesTrack.innerHTML;
+
+  // Vimeo click-to-play facades — only one video plays at a time
+  const vimeoFacades = document.querySelectorAll('.vimeo-facade');
+  function resetFacade(el){
+    el.innerHTML = `
+      <span class="work-tag">${el.dataset.tag || ''}</span>
+      <img class="yt-thumb-img" src="${el.dataset.poster || ''}" alt="">
+      <div class="play"></div>
+    `;
+  }
+  vimeoFacades.forEach(el => {
+    // remember original tag text + poster before first click
+    const tagEl = el.querySelector('.work-tag');
+    if(tagEl) el.dataset.tag = tagEl.textContent;
+    const imgEl = el.querySelector('img');
+    if(imgEl) el.dataset.poster = imgEl.getAttribute('src');
+
+    el.addEventListener('click', () => {
+      // reset any other currently-playing video back to thumbnail
+      vimeoFacades.forEach(other => {
+        if(other !== el && other.querySelector('iframe')){
+          resetFacade(other);
+        }
+      });
+      const id = el.dataset.vimeoId;
+      el.innerHTML = `<iframe src="https://player.vimeo.com/video/${id}?autoplay=1&title=0&byline=0&portrait=0&badge=0&dnt=1" title="Vimeo video" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe>`;
+    });
+  });
+
+  // Bulk order discount slider
+  const bulkSlider = document.getElementById('bulkSlider');
+  const bulkVideos = document.getElementById('bulkVideos');
+  const bulkDiscount = document.getElementById('bulkDiscount');
+  const bulkPerVideo = document.getElementById('bulkPerVideo');
+  const BASE_PRICE = 1999;
+  const MIN_DISCOUNT = 10;
+  const MAX_DISCOUNT = 30;
+
+  function updateBulk(){
+    const videos = parseInt(bulkSlider.value, 10);
+    const pct = MIN_DISCOUNT + ((videos - 10) / (50 - 10)) * (MAX_DISCOUNT - MIN_DISCOUNT);
+    const discount = Math.round(pct);
+    const perVideo = Math.round(BASE_PRICE * (1 - discount / 100));
+    bulkVideos.textContent = videos;
+    bulkDiscount.textContent = discount + '%';
+    bulkPerVideo.textContent = '₹' + perVideo.toLocaleString('en-IN');
+    const fillPct = ((videos - 10) / (50 - 10)) * 100;
+    bulkSlider.style.background = `linear-gradient(90deg, var(--accent) ${fillPct}%, var(--line) ${fillPct}%)`;
+  }
+  if(bulkSlider){
+    bulkSlider.addEventListener('input', updateBulk);
+    updateBulk();
+  }
+</script>
+
+<script>
+  // ---- Sample reels: 3D coverflow carousel ----
+  (function(){
+    const track = document.getElementById('reelTrack');
+    if(!track) return;
+    const cards = Array.from(track.querySelectorAll('.reel-card'));
+    const dotsWrap = document.getElementById('reelDots');
+    const prevBtn = document.getElementById('reelPrev');
+    const nextBtn = document.getElementById('reelNext');
+    let active = Math.floor(cards.length / 2);
+
+    // build navigation dots
+    const dots = cards.map((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'reel-dot';
+      d.setAttribute('aria-label', 'Go to reel ' + (i + 1));
+      d.addEventListener('click', () => setActive(i));
+      dotsWrap.appendChild(d);
+      return d;
+    });
+
+    function resetCard(c){
+      c.innerHTML =
+        '<span class="rc-tag">' + (c.dataset.tag || '') + '</span>' +
+        '<img src="' + (c.dataset.poster || '') + '" alt="Sample reel">' +
+        '<div class="rc-shade"></div><div class="play"></div>';
+    }
+    function stopOthers(except){
+      cards.forEach(c => { if(c !== except && c.querySelector('iframe')) resetCard(c); });
+    }
+    function playCard(c){
+      const id = c.dataset.vimeoId;
+      if(!id || c.querySelector('iframe')) return;
+      stopOthers(c);
+      c.innerHTML = '<iframe src="https://player.vimeo.com/video/' + id +
+        '?autoplay=1&title=0&byline=0&portrait=0&badge=0&dnt=1" title="Vimeo video" ' +
+        'allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe>';
+    }
+
+    function layout(){
+      cards.forEach((card, i) => {
+        const off = i - active;
+        const abs = Math.abs(off);
+        const sign = Math.sign(off);
+        card.classList.toggle('active', off === 0);
+        if(abs > 3){
+          card.style.opacity = 0;
+          card.style.pointerEvents = 'none';
+          card.style.transform = 'translateX(' + (sign * 460) + 'px) translateZ(-760px) scale(.5)';
+          card.style.zIndex = 0;
+          return;
+        }
+        card.style.pointerEvents = 'auto';
+        card.style.opacity = off === 0 ? 1 : (abs === 1 ? 0.92 : (abs === 2 ? 0.6 : 0.32));
+        const tx = off * 138;
+        const tz = -abs * 150 + (off === 0 ? 40 : 0);
+        const ry = -sign * 42;
+        const sc = off === 0 ? 1.06 : 1 - abs * 0.06;
+        card.style.transform =
+          'translateX(' + tx + 'px) translateZ(' + tz + 'px) rotateY(' + ry + 'deg) scale(' + sc + ')';
+        card.style.zIndex = 10 - abs;
+      });
+      dots.forEach((d, i) => d.classList.toggle('active', i === active));
+    }
+
+    function setActive(i){
+      i = Math.max(0, Math.min(cards.length - 1, i));
+      if(i === active) return;
+      stopOthers(null);
+      active = i;
+      layout();
+    }
+
+    cards.forEach((card, i) => {
+      card.addEventListener('click', () => {
+        if(i === active) playCard(card);
+        else setActive(i);
+      });
+    });
+    prevBtn.addEventListener('click', () => setActive(active - 1));
+    nextBtn.addEventListener('click', () => setActive(active + 1));
+
+    // keyboard support
+    track.setAttribute('tabindex', '0');
+    track.addEventListener('keydown', e => {
+      if(e.key === 'ArrowLeft'){ setActive(active - 1); e.preventDefault(); }
+      if(e.key === 'ArrowRight'){ setActive(active + 1); e.preventDefault(); }
+    });
+
+    // swipe support
+    let startX = null;
+    track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true});
+    track.addEventListener('touchend', e => {
+      if(startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if(Math.abs(dx) > 40) setActive(active + (dx < 0 ? 1 : -1));
+      startX = null;
+    });
+
+    layout();
+  })();
+</script>
+
+</body>
+</html>
