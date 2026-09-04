@@ -1119,6 +1119,7 @@
     const name = document.getElementById('leadName').value.trim();
     const phone = document.getElementById('leadPhone').value.trim();
     const service = document.getElementById('leadService').value;
+    if(window.logEvent) window.logEvent('lead_submit', `${name} | ${phone} | ${service}`);
     const message = `Hi, I'm ${name} (${phone}). I'm interested in: ${service}. Please share more details.`;
     window.open(`https://wa.me/919361835754?text=${encodeURIComponent(message)}`, '_blank');
   });
@@ -1399,6 +1400,7 @@
         });
       }catch(e){}
     }
+    window.logEvent = logEvent; // expose so the lead form handler can also log to the sheet
 
     // 1) Log every visit
     logEvent('page_view');
