@@ -1376,5 +1376,55 @@
     });
   })();
 </script>
+
+<script>
+  // ---- Visitor analytics -> Google Sheet (via Apps Script Web App) ----
+  (function(){
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxOfTZvs_7YxfpzU9dm5_i0QhBT05Ns1rKu-kXM2MHu_0b8XHt34ymBGtgFScpFfXexng/exec';
+
+    function logEvent(eventType, label){
+      if(!SHEET_URL || SHEET_URL.indexOf('PASTE_YOUR') !== -1) return; // not set up yet — does nothing
+      try{
+        fetch(SHEET_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {'Content-Type': 'text/plain'},
+          body: JSON.stringify({
+            event: eventType,
+            label: label || '',
+            page: location.href,
+            referrer: document.referrer || 'direct',
+            userAgent: navigator.userAgent
+          })
+        });
+      }catch(e){}
+    }
+
+    // 1) Log every visit
+    logEvent('page_view');
+
+    // 2) Scroll depth — logs once each at 25/50/75/100%
+    const seen = {25:false,50:false,75:false,100:false};
+    window.addEventListener('scroll', function(){
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+      [25,50,75,100].forEach(function(m){
+        if(pct >= m && !seen[m]){
+          seen[m] = true;
+          logEvent('scroll_depth', m + '%');
+        }
+      });
+    });
+
+    // 3) Clicks — every link & button, labelled by its visible text
+    document.querySelectorAll('a, button').forEach(function(el){
+      el.addEventListener('click', function(){
+        const label = (el.textContent || '').trim().slice(0,60) || el.className || el.tagName;
+        logEvent('click', label);
+      });
+    });
+  })();
+</script>
 </body>
 </html>
