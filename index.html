@@ -954,37 +954,6 @@
     <h2 class="section-title reveal">Pick the tier that fits your content.</h2>
     <p class="section-sub reveal">Every package includes hook-driven editing, sound design and platform-ready exports — delivered fast.</p>
 
-    <div class="pricing-grid" style="grid-template-columns:1fr 1fr;margin-top:52px;">
-      <div class="price-card featured reveal">
-        <span class="price-badge offer">On-Site Shoot</span>
-        <div class="tier-name">7 Days 7 Reels</div>
-        <div class="tier-price">₹17,999</div>
-        <ul class="tier-list">
-          <li>7 reels — full on-site shoot + edit</li>
-          <li>One reel shot & delivered every day</li>
-          <li>High-quality camera & mic setup</li>
-          <li>Hook-driven editing on every reel</li>
-          <li>Best value for consistent posting</li>
-        </ul>
-        <a href="#contact" class="tier-cta">Book This Package</a>
-      </div>
-      <div class="price-card reveal">
-        <span class="price-badge offer">Launch Offer</span>
-        <div class="tier-name">Single Reel — Shoot & Edit</div>
-        <div class="tier-price">₹3,999</div>
-        <ul class="tier-list">
-          <li>On-location shoot for 1 reel</li>
-          <li>High-quality camera & mic setup</li>
-          <li>Full editing handled in-house</li>
-          <li>Perfect for a one-off shoot & edit</li>
-        </ul>
-        <a href="#contact" class="tier-cta">Book a Shoot</a>
-      </div>
-    </div>
-
-    <h2 class="section-title reveal" style="margin-top:72px;">Reel Editing — pick your tier.</h2>
-    <p class="section-sub reveal">Already have the footage? Just send it over — we handle the edit.</p>
-
     <div class="pricing-grid">
       <div class="price-card reveal">
         <span class="price-badge offer">Launch Offer</span>
@@ -1079,8 +1048,6 @@
         <div class="lead-field">
           <label for="leadService">What do you need?</label>
           <select id="leadService">
-            <option>7 Days 7 Reels — On-Site Shoot (₹17,999)</option>
-            <option>Single Reel — Shoot & Edit (₹3,999)</option>
             <option>Reel Editing — Minimal (₹1,299)</option>
             <option>Reel Editing — Standard (₹2,299)</option>
             <option>Reel Editing — High (₹3,299)</option>
@@ -1119,7 +1086,7 @@
     const name = document.getElementById('leadName').value.trim();
     const phone = document.getElementById('leadPhone').value.trim();
     const service = document.getElementById('leadService').value;
-    if(window.logEvent) window.logEvent('lead_submit', `${name} | ${phone} | ${service}`);
+    if(window.logLead) window.logLead(name, phone, service);
     const message = `Hi, I'm ${name} (${phone}). I'm interested in: ${service}. Please share more details.`;
     window.open(`https://wa.me/919360835754?text=${encodeURIComponent(message)}`, '_blank');
   });
@@ -1383,24 +1350,27 @@
   (function(){
     const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxOfTZvs_7YxfpzU9dm5_i0QhBT05Ns1rKu-kXM2MHu_0b8XHt34ymBGtgFScpFfXexng/exec';
 
-    function logEvent(eventType, label){
+    function logEvent(eventType, label, extra){
       if(!SHEET_URL || SHEET_URL.indexOf('PASTE_YOUR') !== -1) return; // not set up yet — does nothing
       try{
         fetch(SHEET_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: {'Content-Type': 'text/plain'},
-          body: JSON.stringify({
+          body: JSON.stringify(Object.assign({
             event: eventType,
             label: label || '',
             page: location.href,
             referrer: document.referrer || 'direct',
             userAgent: navigator.userAgent
-          })
+          }, extra || {}))
         });
       }catch(e){}
     }
     window.logEvent = logEvent; // expose so the lead form handler can also log to the sheet
+    window.logLead = function(name, phone, service){
+      logEvent('lead_submit', service || '', { name: name || '', phone: phone || '' });
+    };
 
     // 1) Log every visit
     logEvent('page_view');
