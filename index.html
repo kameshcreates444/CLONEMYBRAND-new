@@ -1086,7 +1086,7 @@
     const name = document.getElementById('leadName').value.trim();
     const phone = document.getElementById('leadPhone').value.trim();
     const service = document.getElementById('leadService').value;
-    if(window.logLead) window.logLead(name, phone, service);
+    if(window.logEvent) window.logEvent('lead_submit', `${name} | ${phone} | ${service}`);
     const message = `Hi, I'm ${name} (${phone}). I'm interested in: ${service}. Please share more details.`;
     window.open(`https://wa.me/919360835754?text=${encodeURIComponent(message)}`, '_blank');
   });
